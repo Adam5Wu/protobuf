@@ -95,17 +95,17 @@ GenerateClearCode(io::Printer* printer) const {
 
 void MessageFieldGenerator::
 GenerateMergingCode(io::Printer* printer) const {
-  printer->Print(variables_,
-    "if (this.$name$ == null) {\n"
-    "  this.$name$ = new $type$();\n"
-    "}\n");
+//  printer->Print(variables_,
+//    "if (this.$name$ == null) {\n"
+//    "  this.$name$ = new $type$();\n"
+//    "}\n");
 
   if (descriptor_->type() == FieldDescriptor::TYPE_GROUP) {
     printer->Print(variables_,
-      "input.readGroup(this.$name$, $number$);\n");
+      "this.$name$ = ($type$)input.readGroup(this.$name$, $type$.class, $number$);\n");
   } else {
     printer->Print(variables_,
-      "input.readMessage(this.$name$);\n");
+      "this.$name$ = ($type$)input.readMessage(this.$name$, $type$.class);\n");
   }
 }
 
@@ -193,11 +193,12 @@ GenerateClearCode(io::Printer* printer) const {
 void MessageOneofFieldGenerator::
 GenerateMergingCode(io::Printer* printer) const {
   printer->Print(variables_,
-    "if (!($has_oneof_case$)) {\n"
-    "  this.$oneof_name$_ = new $type$();\n"
-    "}\n"
-    "input.readMessage(\n"
-    "    (com.google.protobuf.nano.MessageNano) this.$oneof_name$_);\n"
+//    "if (!($has_oneof_case$)) {\n"
+//    "  this.$oneof_name$_ = new $type$();\n"
+//    "}\n"
+    "this.$oneof_name$_ = input.readMessage(\n"
+    "    (com.google.protobuf.nano.MessageNano) this.$oneof_name$_,"
+    "    $type$.class);\n"
     "$set_oneof_case$;\n");
 }
 
@@ -272,29 +273,29 @@ GenerateMergingCode(io::Printer* printer) const {
     "if (i != 0) {\n"
     "  java.lang.System.arraycopy(this.$name$, 0, newArray, 0, i);\n"
     "}\n"
-    "for (; i < newArray.length - 1; i++) {\n"
-    "  newArray[i] = new $type$();\n");
+    "for (; i < newArray.length - 1; i++) {\n");
+//    "  newArray[i] = new $type$();\n");
 
   if (descriptor_->type() == FieldDescriptor::TYPE_GROUP) {
     printer->Print(variables_,
-      "  input.readGroup(newArray[i], $number$);\n");
+      "  newArray[i] = ($type$)input.readGroup(newArray[i], $type$.class, $number$);\n");
   } else {
     printer->Print(variables_,
-      "  input.readMessage(newArray[i]);\n");
+      "  newArray[i] = ($type$)input.readMessage(newArray[i], $type$.class);\n");
   }
 
   printer->Print(variables_,
     "  input.readTag();\n"
     "}\n"
-    "// Last one without readTag.\n"
-    "newArray[i] = new $type$();\n");
+    "// Last one without readTag.\n");
+//    "newArray[i] = new $type$();\n");
 
   if (descriptor_->type() == FieldDescriptor::TYPE_GROUP) {
     printer->Print(variables_,
-      "input.readGroup(newArray[i], $number$);\n");
+      "newArray[i] = ($type$)input.readGroup(newArray[i], $type$.class, $number$);\n");
   } else {
     printer->Print(variables_,
-      "input.readMessage(newArray[i]);\n");
+      "newArray[i] = ($type$)input.readMessage(newArray[i], $type$.class);\n");
   }
 
   printer->Print(variables_,
